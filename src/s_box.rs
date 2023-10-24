@@ -18,58 +18,27 @@ pub const RIJNDAEL_AES_SBOX: [u8; 256] = [
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 ];
 
-pub fn encrypt_sbox(str: String) -> Result<Vec<u8>, String> {
-    if str.is_empty() {
-        return Err(String::from("Input string is empty"));
+
+pub fn encrypt_sbox(byte_str: Vec<u8>) -> Result<Vec<u8>, String> {
+    if byte_str.is_empty() {
+        return Err(String::from("Input byte string is empty"));
     }
     let mut result: Vec<u8> = vec![];
-    let mut hex_str: Vec<u8> = vec![];
-    for char in str.clone().as_bytes() {
-        hex_str.push(*char);
-    }
-    for hex in hex_str {
-        result.push(RIJNDAEL_AES_SBOX[hex as usize]);
+    for byte in byte_str {
+        result.push(RIJNDAEL_AES_SBOX[byte as usize]);
     }
     Ok(result)
 }
 
-pub fn decrypt_sbox(sbox_encrypt: Vec<u8>, sbox: [u8; 256]) -> Result<String, String> {
+pub fn decrypt_sbox(sbox_encrypt: Vec<u8>, sbox: [u8; 256]) -> Result<Vec<u8>, String> {
     if sbox_encrypt.is_empty() {
         return Err(String::from("Input is empty"));
     }
-    let mut result = String::new();
+    let mut result: Vec<u8> = vec![];
     let inv_sbox = invers_sbox(sbox).unwrap();
-    let mut hex_str: Vec<u8> = vec![];
-    let mut hex_nums_count = 0;
-    let mut counter = 0;
     for hex in sbox_encrypt {
         let inversed = inv_sbox[hex as usize];
-        if inversed >= 0xf0 {
-            hex_nums_count = 4;
-            counter += 1;
-            hex_str.push(inversed);
-        } else if inversed >= 0xe0 && inversed <= 0xef {
-            hex_nums_count = 3;
-            counter += 1;
-            hex_str.push(inversed);
-        } else if inversed >= 0xc2 && inversed <= 0xdf {
-            hex_nums_count = 2;
-            counter += 1;
-            hex_str.push(inversed);
-        } else if counter != hex_nums_count {
-            counter += 1;
-            hex_str.push(inversed);
-            if counter == hex_nums_count {
-                result.push_str(std::str::from_utf8(&hex_str).unwrap());
-                hex_str.clear();
-                counter = 0;
-            }
-        } else {
-            hex_str.push(inversed);
-            result.push_str(std::str::from_utf8(&hex_str).unwrap());
-            hex_str.clear();
-            counter = 0;
-        }
+        result.push(inversed);
     }
     Ok(result)
 }

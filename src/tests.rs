@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use crate::s_box::*;
+    use crate::{s_box::*, p_box::{decrypt_pbox, encrypt_pbox, pbox_inverse}};
 
     #[test]
     fn inv_s_box_test() {
@@ -27,22 +27,53 @@ mod test {
     #[test]
     fn encrypt_sbox_test() {
         let input_string = "ABCabc123@#$¥ðþ".to_string();
+        let input = input_string.into_bytes();
         let vec_result = vec![0x83, 0x2c, 0x1a, 
         0xef, 0xaa, 0xfb, 
         0xc7, 0x23, 0xc3, 
         0x09, 0x26, 0x36, 
         0x25, 0x06, 0x2e, 0xe7, 0x2e, 0xae];
-        assert_eq!(vec_result, encrypt_sbox(input_string).unwrap());
+        assert_eq!(vec_result, encrypt_sbox(input).unwrap());
     }
 
     #[test]
     fn decrypt_sbox_test() {
         let input_string = "ABCabc123@#$¥ðþ".to_string();
+        let input = input_string.into_bytes();
         let vec_result = vec![0x83, 0x2c, 0x1a, 
         0xef, 0xaa, 0xfb, 
         0xc7, 0x23, 0xc3, 
         0x09, 0x26, 0x36, 
         0x25, 0x06, 0x2e, 0xe7, 0x2e, 0xae];
-        assert_eq!(input_string, decrypt_sbox(vec_result, RIJNDAEL_AES_SBOX).unwrap());
+        assert_eq!(input, decrypt_sbox(vec_result, RIJNDAEL_AES_SBOX).unwrap());
+    }
+
+    #[test]
+    fn generate_pbox_test() {
+        
+    }
+
+    #[test]
+    fn inv_pbox_test() {
+        let p_box = vec![2, 5, 3, 1, 4, 0];
+        let inv_pbox = vec![5, 3, 0, 2, 4, 1];
+        assert_eq!(inv_pbox, pbox_inverse(p_box).unwrap());
+    }
+
+    #[test]
+    fn encrypt_pbox_test() {
+        let input_string = "겡𘚟𒤩".to_string();
+        let p_box = vec![7, 9, 6, 0, 1, 5, 2, 8, 3, 4, 10];
+        let result = vec![0xf0, 0xa4, 0x9f, 0xea, 0xb2, 0x9a, 0xa1, 0x92, 0xf0, 0x98, 0xa9];
+        assert_eq!(result, encrypt_pbox(input_string, p_box).unwrap())
+    }
+
+
+    #[test]
+    fn decrypt_pbox_test() {
+        let input_string = "겡𘚟𒤩".to_string();
+        let p_box = vec![7, 9, 6, 0, 1, 5, 2, 8, 3, 4, 10];
+        let result = vec![0xf0, 0xa4, 0x9f, 0xea, 0xb2, 0x9a, 0xa1, 0x92, 0xf0, 0x98, 0xa9];
+        assert_eq!(input_string, decrypt_pbox(result, p_box).unwrap());
     }
 }
