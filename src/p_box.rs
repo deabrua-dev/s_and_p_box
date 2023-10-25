@@ -1,5 +1,4 @@
 use std::vec;
-use rand::{self, Rng};
 
 
 pub fn generate_pbox(key: String, size: usize) -> Result<Vec<u64>, String> {
@@ -15,9 +14,7 @@ pub fn generate_pbox(key: String, size: usize) -> Result<Vec<u64>, String> {
     }
     let key_len = key.len();
     for i in 0..result.len() {
-        let random_index = rand::thread_rng().gen_range(0..key_len);
-        let swap_index = (result[i] as usize ^ key.as_bytes()[random_index] as usize) % size;
-        
+        let swap_index = (result[i] as usize ^ key.as_bytes()[i % key_len] as usize) % size;
         (result[i], result[swap_index]) = (result[swap_index], result[i])
     }
     Ok(result)
@@ -48,7 +45,7 @@ pub fn decrypt_pbox(input: Vec<u64>, p_box: Vec<u64>) -> Result<String, String> 
     }
     let mut result = String::new();
     let mut bytes: Vec<u8> = vec![];
-    let pbox_inverse = pbox_inverse(p_box).unwrap();
+    let pbox_inverse = invers_pbox(p_box).unwrap();
     for i in 0..input.len() {
         bytes.push(input[pbox_inverse[i] as usize] as u8);
     }
@@ -56,7 +53,7 @@ pub fn decrypt_pbox(input: Vec<u64>, p_box: Vec<u64>) -> Result<String, String> 
     Ok(result)
 }
 
-pub fn pbox_inverse(input: Vec<u64>) -> Result<Vec<u64>, String> {
+pub fn invers_pbox(input: Vec<u64>) -> Result<Vec<u64>, String> {
     if input.is_empty() {
         return Err(String::from("P-box is empty"));
     }

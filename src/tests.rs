@@ -3,7 +3,7 @@ mod test {
     use crate::{s_box::*, p_box::*};
 
     #[test]
-    fn inv_s_box_test() {
+    fn inverse_sbox_test() {
         let inv_rijndael_aes_sbox = [
             0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
             0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
@@ -61,11 +61,11 @@ mod test {
     }
 
     #[test]
-    fn inv_pbox_test() {
+    fn inverse_pbox_test() {
         let p_box = vec![2, 5, 3, 1, 4, 0];
         let inv_pbox = vec![5, 3, 0, 2, 4, 1];
 
-        assert_eq!(inv_pbox, pbox_inverse(p_box).unwrap());
+        assert_eq!(inv_pbox, invers_pbox(p_box).unwrap());
     }
 
     #[test]
